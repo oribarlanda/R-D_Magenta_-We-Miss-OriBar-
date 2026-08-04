@@ -2,12 +2,6 @@
   "attempts": 5,
   "groups": [
     {
-      "title": "התחילו השנה",
-      "difficulty": "very easy",
-      "hint": "חדש על המדף",
-      "words": ["רועי", "עדי", "שחר (קטן)", "משה"]
-    },
-    {
       "title": "Habla Español?",
       "difficulty": "medium",
       "hint": "מונדיאל",
