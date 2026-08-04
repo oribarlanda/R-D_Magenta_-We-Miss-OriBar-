@@ -1,12 +1,12 @@
 {
   "start": "דביר אפק",
   "end": "גדי",
-  "endExplanation": "???",
+  "endExplanation": "קיבוץ עין גדי",
   "links": [
-    { "answer": "נשר", "hint": "רמז לאבן", "explanation": "?????" },
+    { "answer": "נשר", "hint": "רמז לאבן", "explanation": "דביר שלנו גר בנשר ואורי בר הוא אחלה גבר" },
     { "answer": "בירה", "hint": "רמז לכליות", "explanation": "בירה נשר" },
-    { "answer": "שעורה", "hint": "רמז למשאבה", "explanation": "?????" },
-    { "answer": "עין", "hint": "רמז לשוק", "explanation": "?????" }
+    { "answer": "שעורה", "hint": "רמז למשאבה", "explanation": "בירה מכינים משעורה" },
+    { "answer": "עין", "hint": "רמז לשוק", "explanation": "שעורה בעין" }
   ],
   "distractors": ["חלב", "AI", "חיטה", "שלכת"]
 }
