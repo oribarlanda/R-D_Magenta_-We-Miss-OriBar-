@@ -1,12 +1,12 @@
 {
-  "start": "יהודה",
-  "end": "פולין",
-  "endExplanation": "תצורת פולין - תצורת שוק חדשה (אולי מרמז על היעד בו יהיה הניסוי)",
+  "start": "דביר אפק",
+  "end": "גדי",
+  "endExplanation": "???",
   "links": [
-    { "answer": "אבן", "hint": "רמז לאבן", "explanation": "אבן יהודה" },
-    { "answer": "כליות", "hint": "רמז לכליות", "explanation": "אבנים בכליות" },
-    { "answer": "משאבה", "hint": "רמז למשאבה", "explanation": "משאבה לכליות (המוצר הראשון)" },
-    { "answer": "שוק", "hint": "רמז לשוק", "explanation": "משאבה לחולי שוק" }
+    { "answer": "נשר", "hint": "רמז לאבן", "explanation": "?????" },
+    { "answer": "בירה", "hint": "רמז לכליות", "explanation": "בירה נשר" },
+    { "answer": "שעורה", "hint": "רמז למשאבה", "explanation": "?????" },
+    { "answer": "עין", "hint": "רמז לשוק", "explanation": "?????" }
   ],
-  "distractors": ["שומרון", "יוסי", "ירך", "שואה"]
+  "distractors": ["חלב", "AI", "חיטה", "שלכת"]
 }
