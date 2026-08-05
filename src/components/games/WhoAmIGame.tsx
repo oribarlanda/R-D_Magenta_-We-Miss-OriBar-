@@ -1,12 +1,15 @@
 "use client";
-import { useState } from "react";
-import Image from "next/image";
+import { useState, useRef, useEffect } from "react";
 import type { WhoAmIData } from "@/types";
 import { saveScore, calcScore } from "@/lib/storage";
 import GameResult from "@/components/ui/GameResult";
 
 const TOTAL_STEPS = 7;
-const BLUR_LEVELS = [40, 32, 24, 18, 12, 6, 0];
+// כמות "בלוקים" לאורך הצד - ככל שהמספר קטן יותר, הפיקסלים גדולים ומטושטשים יותר
+// 0 = תמונה חדה וברורה לגמרי
+const PIXEL_BLOCKS = [8, 11, 15, 20, 28, 40, 0];
+// רזולוציית העבודה הפנימית של הקנבס (ריבוע)
+const CANVAS_SIZE = 600;
 
 interface WhoAmIDataWithImage extends WhoAmIData {
   image?: string;
@@ -18,11 +21,64 @@ export default function WhoAmIGame({ data }: { data: WhoAmIDataWithImage }) {
   const [finished, setFinished] = useState(false);
   const [won, setWon] = useState(false);
   const [wrong, setWrong] = useState(false);
+  const [imgLoaded, setImgLoaded] = useState(false);
+
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+  const imgRef = useRef<HTMLImageElement | null>(null);
 
   const hintsUsed = step - 1;
-  const blurPx = BLUR_LEVELS[step - 1] ?? 0;
+  const blocks = finished ? 0 : (PIXEL_BLOCKS[step - 1] ?? 0);
 
   const norm = (s: string) => s.trim().toLowerCase().replace(/['"״]/g, "");
+
+  // טוענים את התמונה פעם אחת
+  useEffect(() => {
+    if (!data.image) return;
+    const img = new window.Image();
+    img.onload = () => {
+      imgRef.current = img;
+      setImgLoaded(true);
+    };
+    img.src = data.image;
+  }, [data.image]);
+
+  // מציירים מחדש בכל שינוי שלב (או כשהתמונה נטענה)
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    const img = imgRef.current;
+    if (!canvas || !img || !imgLoaded) return;
+
+    const ctx = canvas.getContext("2d");
+    if (!ctx) return;
+
+    canvas.width = CANVAS_SIZE;
+    canvas.height = CANVAS_SIZE;
+
+    // חיתוך ריבועי מהמרכז (כמו object-cover)
+    const srcSize = Math.min(img.naturalWidth, img.naturalHeight);
+    const sx = (img.naturalWidth - srcSize) / 2;
+    const sy = (img.naturalHeight - srcSize) / 2;
+
+    if (blocks <= 0) {
+      ctx.imageSmoothingEnabled = true;
+      ctx.clearRect(0, 0, CANVAS_SIZE, CANVAS_SIZE);
+      ctx.drawImage(img, sx, sy, srcSize, srcSize, 0, 0, CANVAS_SIZE, CANVAS_SIZE);
+      return;
+    }
+
+    // שלב 1: ציור התמונה בגודל זעיר לפי מספר הבלוקים
+    const off = document.createElement("canvas");
+    off.width = blocks;
+    off.height = blocks;
+    const offCtx = off.getContext("2d");
+    if (!offCtx) return;
+    offCtx.drawImage(img, sx, sy, srcSize, srcSize, 0, 0, blocks, blocks);
+
+    // שלב 2: הגדלה בחזרה בלי החלקה - זה מה שיוצר את הריבועים החדים
+    ctx.imageSmoothingEnabled = false;
+    ctx.clearRect(0, 0, CANVAS_SIZE, CANVAS_SIZE);
+    ctx.drawImage(off, 0, 0, blocks, blocks, 0, 0, CANVAS_SIZE, CANVAS_SIZE);
+  }, [blocks, imgLoaded]);
 
   const check = () => {
     if (!input.trim()) return;
@@ -58,14 +114,10 @@ export default function WhoAmIGame({ data }: { data: WhoAmIDataWithImage }) {
         style={{ aspectRatio: "1 / 1" }}
       >
         {data.image ? (
-          <Image
-            src={data.image}
-            alt="מי אני?"
-            fill
-            className="object-cover transition-all duration-700"
-            style={{ filter: finished ? "blur(0px)" : `blur(${blurPx}px)`, transform: "scale(1.15)" }}
-            sizes="(max-width: 672px) 100vw, 672px"
-            priority
+          <canvas
+            ref={canvasRef}
+            className="w-full h-full transition-opacity duration-300"
+            style={{ imageRendering: "pixelated" }}
           />
         ) : (
           <div className="w-full h-full flex items-center justify-center text-brand-muted text-sm p-8 text-center">
