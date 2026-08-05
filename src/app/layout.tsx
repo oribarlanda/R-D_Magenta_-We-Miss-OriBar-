@@ -4,8 +4,8 @@ import Header from "@/components/ui/Header";
 import ScoreBar from "@/components/ui/ScoreBar";
 
 export const metadata: Metadata = {
-  title: "החידות של יעל ואורי",
-  description: "אתר משחקים ליום גיבוש החברה",
+  title: "הפעלת יום פיתוח + אורי בר מהנדס על",
+  description: "הפעלה מותאמת אישית לאנשי הפיתוח, כפרה על שחר ועדי",
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
