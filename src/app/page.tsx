@@ -57,7 +57,7 @@ export default function HomePage() {
 </div>
 
 <h1 className="text-2xl font-bold text-brand-text">
-  יום פיתוח - חבל שאורי ב לא פה
+  יום פיתוח אצל גדי בבריכה (לא אצל איילת)
 </h1>
       </div>
 
