@@ -21,7 +21,7 @@ export default function Header() {
               className="h-8 w-auto object-contain"
             />
             <span className="font-bold text-brand-text text-sm">
-              יום בריכה בחצב - אבי"ב הוואי ובידור
+              יום פיתוח 2026 - חבל שאורי בר לא פה :(
             </span>
           </Link>
 
@@ -57,7 +57,7 @@ export default function Header() {
             </h2>
 
             <ul className="space-y-3 text-brand-muted text-sm">
-              <li>🔗 מה הקשר – מצאו 5 קבוצות של 4 מילים.</li>
+              <li>🔗 מה הקשר – מצאו 4 קבוצות של 4 מילים.</li>
               <li>🧠 הגיונית – פתרו חידות היגיון.</li>
               <li>⛓ השרשרת – חברו בין מושגים.</li>
               <li>🎵 איזה שיר – זהו את השיר המתורגם.</li>
