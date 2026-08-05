@@ -1,15 +1,15 @@
 "use client";
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, useCallback } from "react";
 import type { WhoAmIData } from "@/types";
 import { saveScore, calcScore } from "@/lib/storage";
 import GameResult from "@/components/ui/GameResult";
 
 const TOTAL_STEPS = 7;
-// כמות "בלוקים" לאורך הצד - ככל שהמספר קטן יותר, הפיקסלים גדולים ומטושטשים יותר
-// 0 = תמונה חדה וברורה לגמרי
-const PIXEL_BLOCKS = [8, 11, 15, 20, 28, 40, 0];
-// רזולוציית העבודה הפנימית של הקנבס (ריבוע)
 const CANVAS_SIZE = 600;
+// כמות "בלוקים" לאורך הצד - ככל שהמספר קטן יותר, הפיקסלים גדולים ומטושטשים יותר
+// CANVAS_SIZE = תמונה חדה וברורה לגמרי
+const PIXEL_BLOCKS = [8, 11, 15, 20, 28, 40, CANVAS_SIZE];
+const TRANSITION_MS = 550; // משך אנימציית המעבר בין שלבים
 
 interface WhoAmIDataWithImage extends WhoAmIData {
   image?: string;
@@ -25,9 +25,11 @@ export default function WhoAmIGame({ data }: { data: WhoAmIDataWithImage }) {
 
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const imgRef = useRef<HTMLImageElement | null>(null);
+  const currentBlocksRef = useRef<number>(PIXEL_BLOCKS[0]);
+  const animFrameRef = useRef<number | null>(null);
 
   const hintsUsed = step - 1;
-  const blocks = finished ? 0 : (PIXEL_BLOCKS[step - 1] ?? 0);
+  const targetBlocks = finished ? CANVAS_SIZE : (PIXEL_BLOCKS[step - 1] ?? CANVAS_SIZE);
 
   const norm = (s: string) => s.trim().toLowerCase().replace(/['"״]/g, "");
 
@@ -42,11 +44,11 @@ export default function WhoAmIGame({ data }: { data: WhoAmIDataWithImage }) {
     img.src = data.image;
   }, [data.image]);
 
-  // מציירים מחדש בכל שינוי שלב (או כשהתמונה נטענה)
-  useEffect(() => {
+  // מצייר על הקנבס רמת פיקסלציה נתונה
+  const drawAtBlocks = useCallback((blocksVal: number) => {
     const canvas = canvasRef.current;
     const img = imgRef.current;
-    if (!canvas || !img || !imgLoaded) return;
+    if (!canvas || !img) return;
 
     const ctx = canvas.getContext("2d");
     if (!ctx) return;
@@ -54,31 +56,69 @@ export default function WhoAmIGame({ data }: { data: WhoAmIDataWithImage }) {
     canvas.width = CANVAS_SIZE;
     canvas.height = CANVAS_SIZE;
 
-    // חיתוך ריבועי מהמרכז (כמו object-cover)
     const srcSize = Math.min(img.naturalWidth, img.naturalHeight);
     const sx = (img.naturalWidth - srcSize) / 2;
     const sy = (img.naturalHeight - srcSize) / 2;
 
-    if (blocks <= 0) {
+    const b = Math.round(blocksVal);
+
+    if (b >= CANVAS_SIZE) {
       ctx.imageSmoothingEnabled = true;
       ctx.clearRect(0, 0, CANVAS_SIZE, CANVAS_SIZE);
       ctx.drawImage(img, sx, sy, srcSize, srcSize, 0, 0, CANVAS_SIZE, CANVAS_SIZE);
       return;
     }
 
-    // שלב 1: ציור התמונה בגודל זעיר לפי מספר הבלוקים
     const off = document.createElement("canvas");
-    off.width = blocks;
-    off.height = blocks;
+    off.width = Math.max(1, b);
+    off.height = Math.max(1, b);
     const offCtx = off.getContext("2d");
     if (!offCtx) return;
-    offCtx.drawImage(img, sx, sy, srcSize, srcSize, 0, 0, blocks, blocks);
+    offCtx.drawImage(img, sx, sy, srcSize, srcSize, 0, 0, off.width, off.height);
 
-    // שלב 2: הגדלה בחזרה בלי החלקה - זה מה שיוצר את הריבועים החדים
     ctx.imageSmoothingEnabled = false;
     ctx.clearRect(0, 0, CANVAS_SIZE, CANVAS_SIZE);
-    ctx.drawImage(off, 0, 0, blocks, blocks, 0, 0, CANVAS_SIZE, CANVAS_SIZE);
-  }, [blocks, imgLoaded]);
+    ctx.drawImage(off, 0, 0, off.width, off.height, 0, 0, CANVAS_SIZE, CANVAS_SIZE);
+  }, []);
+
+  // אנימציה חלקה בין רמת הפיקסלציה הקודמת לחדשה
+  useEffect(() => {
+    if (!imgLoaded) return;
+
+    const startBlocks = currentBlocksRef.current;
+    const endBlocks = targetBlocks;
+
+    if (animFrameRef.current) cancelAnimationFrame(animFrameRef.current);
+
+    if (startBlocks === endBlocks) {
+      drawAtBlocks(endBlocks);
+      return;
+    }
+
+    const startTime = performance.now();
+
+    const tick = (now: number) => {
+      const elapsed = now - startTime;
+      const t = Math.min(elapsed / TRANSITION_MS, 1);
+      const eased = 1 - Math.pow(1 - t, 3); // easeOutCubic
+      const value = startBlocks + (endBlocks - startBlocks) * eased;
+
+      currentBlocksRef.current = value;
+      drawAtBlocks(value);
+
+      if (t < 1) {
+        animFrameRef.current = requestAnimationFrame(tick);
+      } else {
+        currentBlocksRef.current = endBlocks;
+      }
+    };
+
+    animFrameRef.current = requestAnimationFrame(tick);
+
+    return () => {
+      if (animFrameRef.current) cancelAnimationFrame(animFrameRef.current);
+    };
+  }, [targetBlocks, imgLoaded, drawAtBlocks]);
 
   const check = () => {
     if (!input.trim()) return;
@@ -116,7 +156,7 @@ export default function WhoAmIGame({ data }: { data: WhoAmIDataWithImage }) {
         {data.image ? (
           <canvas
             ref={canvasRef}
-            className="w-full h-full transition-opacity duration-300"
+            className="w-full h-full"
             style={{ imageRendering: "pixelated" }}
           />
         ) : (
