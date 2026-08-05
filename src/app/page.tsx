@@ -57,7 +57,7 @@ export default function HomePage() {
 </div>
 
 <h1 className="text-2xl font-bold text-brand-text">
-  יום בריכה בחצב - אבי"ב הוואי ובידור
+  יום פיתוח - חבל שאורי ב לא פה
 </h1>
       </div>
 
