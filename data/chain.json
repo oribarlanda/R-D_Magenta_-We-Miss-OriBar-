@@ -1,12 +1,12 @@
 {
-  "start": "דביר אפק",
-  "end": "גדי",
-  "endExplanation": "קיבוץ עין גדי",
+  "start": "שחר גדול",
+  "end": "קרעי",
+  "endExplanation": "שלמה קרעי",
   "links": [
-    { "answer": "נשר", "hint": "רמז לאבן", "explanation": "דביר שלנו גר בנשר ואורי בר הוא אחלה גבר" },
-    { "answer": "בירה", "hint": "רמז לכליות", "explanation": "בירה נשר" },
-    { "answer": "שעורה", "hint": "רמז למשאבה", "explanation": "בירה מכינים משעורה" },
-    { "answer": "עין", "hint": "רמז לשוק", "explanation": "שעורה בעין" }
+    { "answer": "חתונה", "hint": "אין", "explanation": "שחר עוד שבוע מתחתנתתתתת" },
+    { "answer": "MD", "hint": "אין", "explanation": "צריך לקחת משהו כדי להישאר ערים עד 4" },
+    { "answer": "דר דוליטל", "hint": "אין", "explanation": "דר זה MD" },
+    { "answer": "שלמה", "hint": "אין", "explanation": "דר דוליטל הציל חיות" }
   ],
-  "distractors": ["חלב", "AI", "חיטה", "שלכת"]
+  "distractors": ["טבעת", "כלב", "דר פישר", "רועי"]
 }
